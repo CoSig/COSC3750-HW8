@@ -10,17 +10,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "wyscanner.h"
 
 int main()
 {
 	char input[1024];
 	int token;
-	const char* lexeme;
+	int piped = 1;
 
 	while (1)
 	{
-		prinf("wyshell> ");
+		printf("$> ");
 		fflush(stdout);
 
 		if (fgets(input, sizeof(input), stdin) == NULL)
@@ -29,14 +30,61 @@ int main()
 		}
 
 		input[strcspn(input, "\n")] = '\0';
-
+		
 		token = parse_line(input);
-		while (token != END)
+		while (token != NULL)
 		{
-			lexeme = get_lexeme();
-			printf("Token: %d, Lexeme: %s\n", token, lexeme);
+			if (token == ERROR_CHAR)
+			{
+				perror("error character: ");
+				perror(error_char);
+			}
+			else if (token == SYSTEM_ERROR)
+			{
+				perror("system error");
+				return 0;
+			}
+			else if (token == QUOTE_ERROR)
+			{
+				perror("quote error");
+			}
+			else
+			{
+				if (token != 200)
+				{
+					if (token == 107)
+					{
+						printf(" |\n");
+					}
+					else if (token == 100)
+					{
+						printf(" >\n");
+					}
+					else
+					{
+						printf(" %d\n", token);
+					}
+					piped = 1;
+				}
+				else if (lexeme == ':')
+				{
+					printf(" :");
+					piped = 1;
+				}
+				else if (piped == 1)
+				{
+					printf(":--: %s\n", lexeme);
+					piped = 0;
+				}
+				else
+				{
+					printf(" --: %d %s\n", token, lexeme);
+				}
+			}
 			token = parse_line(NULL);
 		}
+		printf(" --: EOL\n");
+		piped = 1;
 	}
 
 	return 0;

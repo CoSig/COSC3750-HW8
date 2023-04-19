@@ -16,7 +16,7 @@ RM = /bin/rm -f
 .PHONY: wyshell clean
 
 wyshell: wyshell.c
-    ${CC} ${CFLAGS} wyshell.c wyscanner.c -o wyshell
+	${CC} ${CFLAGS} wyshell.c wyscanner.c -o wyshell
 
 clean:
-    ${RM} wytalkC
+	${RM} wyshell
